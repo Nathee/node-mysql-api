@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+
+  mariadb:
+    image: mariadb:10.1.21
+    container_name: docker-mariadb
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - TERM=xterm
+    volumes:
+      - ./data:/var/lib/mysql
+      - ./backup:/backup
+    ports:
+      - "3336:3306"
