@@ -13,4 +13,4 @@ services:
       - ./data:/var/lib/mysql
       - ./backup:/backup
     ports:
-      - "3336:3306"
+      - "3306:3306"
