@@ -26,9 +26,10 @@ router.get ('', function (req, res) {
     sqlCommand += 'GROUP BY `tbl_user`.`user_id` ';
     sqlCommand += 'LIMIT 1';
 
-    connection.query(sqlCommand, function(err, users, fields) {
-        if (!err && users[0]) { 
-            res.json ({ status: 200, success: true, message: 'OK', items: users[0] }); 
+    connection.query(sqlCommand, function(err, user, fields) {
+        if (err) { res.json({ status: 400, message: 'BAD REQUEST' }); }
+        if (user[0]) { 
+            res.json ({ status: 200, success: true, message: 'OK', item: user[0] }); 
         } else { 
             res.json ({ status: 400, message: 'BAD REQUEST' }); 
         }

@@ -27,7 +27,8 @@ router.get ('', function (req, res) {
     sqlCommand += 'LIMIT 10';
 
     connection.query(sqlCommand, function(err, users, fields) {
-        if (!err && users[0]) { 
+        if (err) { res.json({ status: 400, message: 'BAD REQUEST' }); }
+        if (users[0]) { 
             res.json ({ status: 200, success: true, message: 'OK', items: users }); 
         } else { 
             res.json ({ status: 400, message: 'BAD REQUEST' }); 
