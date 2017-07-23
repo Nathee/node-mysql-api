@@ -11,9 +11,9 @@ module.exports = {
 
     /* db service */
     'db_host'    : '127.0.0.1',
-    'db_port'    : 3306,        // 3336
+    'db_port'    : 3366,        // 3336
     'db_user'    : 'root',      // username
-    'db_pass'    : '123456',    // password
+    'db_pass'    : '-hk,-uf0edyf',    // password
     'db_name'    : 'db_node_api',
     
     /* url */

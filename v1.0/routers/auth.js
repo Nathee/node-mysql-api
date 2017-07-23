@@ -18,33 +18,82 @@ var connection = require('./../../services/connection');
  * Model
  * ====================================================================== */
 
-// GET: http://127.0.0.1:7000/v1.0/auth/token
-router.get ('/token', function (req, res) {
-    res.json ({ status: 200, success: true, message: 'OK' });
-});
+var AuthModel = require('./../../model/auth');
+var UserModel = require('./../../model/user');
+
+/* ======================================================================
+ * Router
+ * ====================================================================== */
 
 // POST: http://127.0.0.1:7000/v1.0/auth/token
 router.post ('/token', function (req, res) {
-    connection.query('SELECT `tbl_user`.`email` FROM `tbl_user` WHERE `email` = ? LIMIT 1', [ req.body.email ], function(err, users, fields) {
-        if (err) { res.json({ status: 400, message: 'BAD REQUEST' }); }
-        if (users[0]) {
-            connection.query('SELECT `tbl_auth`.* FROM `tbl_auth` WHERE `email` = ? LIMIT 1', [ req.body.email ], function(err, auths, fields) {
-                if (err) { res.json({ status: 400, message: 'BAD REQUEST' }); }
-                if (auths[0]) {
-                    var token = jwt.sign(users[0], service.secret, { expiresIn: service.expires, algorithm: 'HS256' });
-                    res.json({ status: 200, success: true, message: 'OK', token: token });
-                } else { 
-                    connection.query('INSERT INTO `tbl_auth` (`email`, `admin`) VALUES (?, ?)', [ req.body.email, 0 ], function(err, rows, fields) {
-                        if (err) { res.json({ status: 400, message: 'BAD REQUEST' }); }
-                        var token = jwt.sign(users[0], service.secret, { expiresIn: service.expires, algorithm: 'HS256' });
-                        res.json({ status: 201, created: true, message: 'CREATED', token: token }); 
-                    });
-                }
+
+    UserModel.findOneByEmail(req.body.email, function(responseUser) {
+
+        AuthModel.findOneByEmail(req.body.email, function (responseAuth) {
+
+            var token = jwt.sign(responseUser, service.secret, { expiresIn: service.expires, algorithm: 'HS256' });
+            res.json({ status: 200, success: true, message: 'OK', token: token });
+            return true;
+
+        }, function (err) {
+            
+            AuthModel.save([ req.body.email, 0 ], function (responseAuth) {
+
+                var token = jwt.sign(responseUser, service.secret, { expiresIn: service.expires, algorithm: 'HS256' });
+                res.json({ status: 201, created: true, message: 'CREATED', token: token });
+                return true;
+
+            }, function (err) {
+
+                res.json({ status: 400, message: 'BAD REQUEST' });
+                return true;
+
             });
-        } else { 
-            res.json({ status: 400, message: 'BAD REQUEST' }); 
-        }
+
+        });
+
+    }, function (err) { 
+
+        res.json({ status: 400, message: 'BAD REQUEST' });
+        return true;
+
     });
+
+});
+
+// GET: http://127.0.0.1:7000/v1.0/auth/tokens
+router.get ('/tokens', function (req, res) {
+    
+    AuthModel.findAll(function (responseAuth) {
+
+        res.json({ status: 200, success: true, message: 'OK', items: responseAuth });
+        return true;
+
+    }, function (err) {
+
+        res.json({ status: 400, message: 'BAD REQUEST' });
+        return true;
+
+    });
+
+});
+
+// GET: http://127.0.0.1:7000/v1.0/auth/tokens/:limit
+router.get ('/tokens/:limit', function (req, res) {
+
+    Auth.findAllByLimit(req.params.limit, function(responseAuth) {
+
+        res.json({ status: 200, success: true, message: 'OK', items: responseAuth });
+        return true;
+
+    }, function (err) {
+
+        res.json({ status: 400, message: 'BAD REQUEST' });
+        return true;
+
+    });
+
 });
 
 module.exports = router;

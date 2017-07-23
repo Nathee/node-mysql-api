@@ -87,11 +87,9 @@ app.use (function (req, res, next) {
  * ====================================================================== */
 
 var auth = require('./v1.0/routers/auth');
-var user = require('./v1.0/routers/user');
 var users = require('./v1.0/routers/users');
 
 app.use('/v1.0/auth', auth);
-app.use('/v1.0/user', user);
 app.use('/v1.0/users', users);
 
 app.listen(service.port);
